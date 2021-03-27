@@ -212,15 +212,22 @@ void DFS(d2a& maze, vector<coordinate>& route) {
         if (maze.loc(curr.up()) == 3 || maze.loc(curr.down()) == 3 ||
             maze.loc(curr.left()) == 3 || maze.loc(curr.right()) == 3)
             break;
-        if(!s.empty() && !U && !D && !L && !R)
-            i = flag_map.loc(s.top());
+        if (!s.empty() && !U && !D && !L && !R) {
+            coordinate last_split = s.top();
+            int last_split_up_flag  = flag_map.loc(last_split.up());
+            int last_split_down_flag = flag_map.loc(last_split.down());
+            int last_split_right_flag = flag_map.loc(last_split.right());
+            int last_split_left_flag = flag_map.loc(last_split.left());
+            i = max(max(last_split_up_flag, last_split_down_flag), max(last_split_right_flag, last_split_left_flag));
+        }
+            
         i++;        //each time take a step on 4 directions, and the current step is ith step
     } //search end
 
     //put these coordinates into the route vector
     coordinate curr = end;
     while(i > 1) {
-        if(flag_map.loc(curr.up()) == i) {
+        /* if(flag_map.loc(curr.up()) == i) {
             route.insert(route.begin() + 1, curr.up());
             curr = curr.up();
         }
@@ -236,7 +243,36 @@ void DFS(d2a& maze, vector<coordinate>& route) {
             route.insert(route.begin() + 1, curr.right());
             curr = curr.right();
         }
-        i--;
+        i--; */
+        //the previous solution cannot find the shortest route
+
+        //show the neighbours
+        struct Node {
+            coordinate c;
+            int flag;
+        };
+        
+        Node neighbours[4];
+        neighbours[0].c = curr.up();
+        neighbours[0].flag = flag_map.loc(neighbours[0].c);
+        neighbours[1].c = curr.down();
+        neighbours[1].flag = flag_map.loc(neighbours[1].c);
+        neighbours[2].c = curr.left();
+        neighbours[2].flag = flag_map.loc(neighbours[2].c);
+        neighbours[3].c = curr.right();
+        neighbours[3].flag = flag_map.loc(neighbours[3].c);
+        
+        int min_neighbour_flag = 1000000;
+        for(int i = 0; i < 4; i++) {
+            if(neighbours[i].flag == 0)
+                continue;
+            else if (neighbours[i].flag < min_neighbour_flag) {
+                min_neighbour_flag = neighbours[i].flag;
+                curr = neighbours[i].c;
+            }
+        }
+        i = min_neighbour_flag;
+        route.insert(route.begin() + 1, curr);
     }
 }
 
@@ -250,10 +286,23 @@ int main() {
 
     vector<coordinate> route;
     route.push_back(start);
-    DFS(maze, route);
+    
+    //choose BFS or DFS
+    while(1){
+        int choice;
+        cout << "Choose algorithm:\n1. BFS\n2. DFS\n";
+        cin >> choice;
+        if(choice == 1) {
+            BFS(maze, route);
+            break;
+        } else if(choice == 2) {
+            DFS(maze, route);
+            break;
+        }
+    }
     
     int Size = route.size();
-    for (int i = 0; i < Size; i++) {
+    for (int i = 1; i < Size; i++) {
         cout << route[i] << "->";
         //line breaker to prevent a too long line
         if (i % 5 == 0) cout << endl; 
@@ -275,12 +324,11 @@ Sample Input:
 1 1 1 1 1 1 1 1 1
 
 Sample Output:
-(2,2)->
-(2,3)->(2,4)->(2,5)->(2,6)->(2,7)->
-(2,8)->(3,8)->(4,8)->(4,7)->(4,6)->
-(5,6)->(6,6)->(6,5)->(6,4)->(5,4)->
-(5,3)->(5,2)->(6,2)->(7,2)->(8,2)->
-(8,3)->(8,4)->(8,5)->(8,6)->(8,7)->
-(8,8)EOF
+(2,2)->(2,3)->(2,4)->(2,5)->(2,6)->
+(2,7)->(2,8)->(3,8)->(4,8)->(4,7)->
+(4,6)->(5,6)->(6,6)->(6,5)->(6,4)->
+(5,4)->(5,3)->(5,2)->(6,2)->(7,2)->
+(8,2)->(8,3)->(8,4)->(8,5)->(8,6)->
+(8,7)->(8,8)EOF
 
 */
