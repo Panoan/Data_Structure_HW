@@ -79,6 +79,7 @@ public:
         }
         delete[] binary_arr;
     }
+
     void input() {
         for(int i = 0; i < len; i++) {
             for(int j = 0; j < wid; j++) {
@@ -114,6 +115,7 @@ public:
     int loc(coordinate some_point) {
         return binary_arr[some_point.r][some_point.c];
     }
+
     //directly using two integers representing row and column
     int loc(int r, int c) {
         return binary_arr[r][c];
@@ -131,6 +133,7 @@ public:
             cout << endl;
         }
     }
+
     void clear() {
         for(int i = 0; i < len; i++) {
             for(int j = 0; j < wid; j++) {
@@ -146,6 +149,7 @@ void BFS(d2a& maze, vector<coordinate>& route) {
     //fill flag_map with 0
     flag_map.clear();
 
+    //search
     queue<coordinate> q;
     q.push(route[0]);
     int i = 1;
@@ -164,6 +168,8 @@ void BFS(d2a& maze, vector<coordinate>& route) {
             q.push(curr.right());
         i++;        //each time take a step on 4 directions, and the current step is ith step
     }
+
+    //save the data to route
     coordinate curr = end;
     while(i > 2) {
         if(flag_map.loc(curr.up()) == i-1) {
@@ -192,6 +198,7 @@ void DFS(d2a& maze, vector<coordinate>& route) {
     //fill flag_map with 0
     flag_map.clear();
     
+    //search
     stack<coordinate> s;
     s.push(route[0]);
     int i = 1;
@@ -301,6 +308,7 @@ int main() {
         }
     }
     
+    //print result
     int Size = route.size();
     for (int i = 1; i < Size; i++) {
         cout << route[i] << "->";
